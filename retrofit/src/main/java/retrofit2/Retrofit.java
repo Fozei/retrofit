@@ -63,6 +63,9 @@ import static retrofit2.Utils.checkNotNull;
 public final class Retrofit {
     private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
 
+    /**
+     * Retrofit中Builder执行build方法时,创建的OKHTTPClient
+     */
     final okhttp3.Call.Factory callFactory;
     final HttpUrl baseUrl;
     final List<Converter.Factory> converterFactories;

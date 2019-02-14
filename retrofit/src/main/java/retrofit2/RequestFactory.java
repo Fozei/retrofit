@@ -276,13 +276,13 @@ final class RequestFactory {
         private Headers parseHeaders(String[] headers) {
             Headers.Builder builder = new Headers.Builder();
             for (String header : headers) {
-                int colon = header.indexOf(':');
-                if (colon == -1 || colon == 0 || colon == header.length() - 1) {
+                int colonIndex = header.indexOf(':');
+                if (colonIndex == -1 || colonIndex == 0 || colonIndex == header.length() - 1) {
                     throw methodError(method,
                             "@Headers value must be in the form \"Name: Value\". Found: \"%s\"", header);
                 }
-                String headerName = header.substring(0, colon);
-                String headerValue = header.substring(colon + 1).trim();
+                String headerName = header.substring(0, colonIndex);
+                String headerValue = header.substring(colonIndex + 1).trim();
                 if ("Content-Type".equalsIgnoreCase(headerName)) {
                     try {
                         contentType = MediaType.get(headerValue);
