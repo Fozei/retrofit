@@ -3,7 +3,6 @@ package com.example;
 import com.google.gson.Gson;
 import okhttp3.ConnectionPool;
 import okhttp3.Dispatcher;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -50,18 +49,6 @@ public class Main {
 
         Call<String> call = iRequestApi.get(jsonString);
         call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                System.out.println(call);
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                System.out.println(call);
-            }
-        });
-        Call<String> call2 = iRequestApi.get2("3333");
-        call2.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 System.out.println(call);

@@ -15,11 +15,11 @@
  */
 package retrofit2;
 
+import okhttp3.ResponseBody;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-
-import okhttp3.ResponseBody;
 
 import static retrofit2.Utils.methodError;
 
@@ -35,6 +35,7 @@ final class HttpServiceMethod<ResponseT, ReturnT> extends ServiceMethod<ReturnT>
     static <ResponseT, ReturnT> HttpServiceMethod<ResponseT, ReturnT> parseAnnotations(Retrofit retrofit, Method method, RequestFactory requestFactory) {
 
         CallAdapter<ResponseT, ReturnT> callAdapter = createCallAdapter(retrofit, method);
+
         Type responseType = callAdapter.responseType();
         if (responseType == Response.class || responseType == okhttp3.Response.class) {
             throw methodError(method, "'"
@@ -45,8 +46,7 @@ final class HttpServiceMethod<ResponseT, ReturnT> extends ServiceMethod<ReturnT>
             throw methodError(method, "HEAD method must use Void as response type.");
         }
 
-        Converter<ResponseBody, ResponseT> responseConverter =
-                createResponseConverter(retrofit, method, responseType);
+        Converter<ResponseBody, ResponseT> responseConverter = createResponseConverter(retrofit, method, responseType);
 
         okhttp3.Call.Factory callFactory = retrofit.callFactory;
         return new HttpServiceMethod<>(requestFactory, callFactory, callAdapter, responseConverter);
@@ -89,7 +89,6 @@ final class HttpServiceMethod<ResponseT, ReturnT> extends ServiceMethod<ReturnT>
 
     @Override
     ReturnT invoke(Object[] args) {
-        return callAdapter.adapt(
-                new OkHttpCall<>(requestFactory, args, callFactory, responseConverter));
+        return callAdapter.adapt(new OkHttpCall<>(requestFactory, args, callFactory, responseConverter));
     }
 }

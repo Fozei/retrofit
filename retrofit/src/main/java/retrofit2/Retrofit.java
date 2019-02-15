@@ -15,20 +15,6 @@
  */
 package retrofit2;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import javax.annotation.Nullable;
-
-import android.util.Log;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -37,6 +23,15 @@ import retrofit2.http.GET;
 import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.Url;
+
+import javax.annotation.Nullable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 
 import static java.util.Collections.unmodifiableList;
 import static retrofit2.Utils.checkNotNull;
@@ -226,7 +221,8 @@ public final class Retrofit {
 
         int start = callAdapterFactories.indexOf(skipPast) + 1;
         for (int i = start, count = callAdapterFactories.size(); i < count; i++) {
-            CallAdapter<?, ?> adapter = callAdapterFactories.get(i).get(returnType, annotations, this);
+            CallAdapter.Factory factory = callAdapterFactories.get(i);
+            CallAdapter<?, ?> adapter = factory.get(returnType, annotations, this);
             if (adapter != null) {
                 return adapter;
             }
@@ -433,8 +429,7 @@ public final class Retrofit {
             }
 
             // Do not add the default, platform-aware call adapters added by build().
-            for (int i = 0,
-                 size = retrofit.callAdapterFactories.size() - platform.defaultCallAdapterFactoriesSize();
+            for (int i = 0, size = retrofit.callAdapterFactories.size() - platform.defaultCallAdapterFactoriesSize();
                  i < size; i++) {
                 callAdapterFactories.add(retrofit.callAdapterFactories.get(i));
             }
@@ -604,14 +599,12 @@ public final class Retrofit {
             if (callbackExecutor == null) {
                 callbackExecutor = platform.defaultCallbackExecutor();
             }
-
             // Make a defensive copy of the adapters and add the default Call adapter.
             List<CallAdapter.Factory> callAdapterFactories = new ArrayList<>(this.callAdapterFactories);
             callAdapterFactories.addAll(platform.defaultCallAdapterFactories(callbackExecutor));
 
             // Make a defensive copy of the converters.
-            List<Converter.Factory> converterFactories = new ArrayList<>(
-                    1 + this.converterFactories.size() + platform.defaultConverterFactoriesSize());
+            List<Converter.Factory> converterFactories = new ArrayList<>(1 + this.converterFactories.size() + platform.defaultConverterFactoriesSize());
 
             // Add the built-in converter factory first. This prevents overriding its behavior but also
             // ensures correct behavior when using converters that consume all types.

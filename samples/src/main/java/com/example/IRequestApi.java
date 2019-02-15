@@ -1,17 +1,21 @@
 package com.example;
 
+import okhttp3.RequestBody;
 import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
+import retrofit2.http.*;
 
 import java.util.Map;
 
 public interface IRequestApi<P> {
-    @GET("hello")
-    Call<String> get(@Query("param") String url);
+    @GET(value = "hello")
+    Call<String> get(@Query(value = "param") String url);
 
-    @GET("hello")
-    Call<String> get2(@Query("param") String url);
+    @POST("hello")
+    Call<String> post1(@Body RequestBody body);
+
+    @FormUrlEncoded
+    @POST("hello")
+    Call<String> post2(@Field(value = "param", encoded = true) String param);
 
     @GET("hello")
     Call<String> get3(@Query("param") String url);

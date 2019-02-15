@@ -15,9 +15,9 @@
  */
 package retrofit2;
 
+import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import javax.annotation.Nullable;
 
 /**
  * Creates call adapters for that uses the same thread for both I/O and application-level
@@ -30,10 +30,13 @@ final class DefaultCallAdapterFactory extends CallAdapter.Factory {
     @Override
     public @Nullable
     CallAdapter<?, ?> get(Type returnType, Annotation[] annotations, Retrofit retrofit) {
+        //装载方法时调用的, returnType--带泛型的返回类型;annotations--方法注解
+        //最外层返回类型必须为call
         if (getRawType(returnType) != Call.class) {
             return null;
         }
 
+        //返回类型必须带泛型,否则报错
         final Type responseType = Utils.getCallResponseType(returnType);
 
         return new CallAdapter<Object, Call<?>>() {
